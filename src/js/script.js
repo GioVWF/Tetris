@@ -9,32 +9,37 @@ const nextCtx = nextCanvas ? nextCanvas.getContext('2d') : null;
 
 const DIFFICULTY_PRESETS = {
   facil: {
-    MS: 800,
-    MIN_SPEED: 100,
-    SPEED_DECREASE_RATE: 10
+    MS: 500,
+    MIN_SPEED: 60,
+    SPEED_DECREASE_RATE: 20,
+    SCORE_MULTIPLIER: 0.8
   },
   normal: {
-    MS: 500,
+    MS: 400,
     MIN_SPEED: 50,
-    SPEED_DECREASE_RATE: 20
+    SPEED_DECREASE_RATE: 20,
+    SCORE_MULTIPLIER: 1.0
   },
   dificil: {
-    MS: 300,
+    MS: 200,
     MIN_SPEED: 30,
-    SPEED_DECREASE_RATE: 30
+    SPEED_DECREASE_RATE: 20,
+    SCORE_MULTIPLIER: 1.5
   },
   imposible: {
-    MS: 200,
-    MIN_SPEED: 20,
-    SPEED_DECREASE_RATE: 40
+    MS: 100,
+    MIN_SPEED: 10,
+    SPEED_DECREASE_RATE: 20,
+    SCORE_MULTIPLIER: 2.0
   }
 };
 
-let MS = 500;
-let MIN_SPEED = 50;
-let SPEED_DECREASE_RATE = 20;
+let MS = 300;
+let MIN_SPEED = 20;
+let SPEED_DECREASE_RATE = 25;
+let SCORE_MULTIPLIER = 1.0;
 
-const FAST_DROP_MS = 10;
+const FAST_DROP_MS = 20;
 var CURRENT_INTERVAL_MS = MS;
 let selectedDifficulty = null;
 
@@ -233,7 +238,6 @@ let maxCombo = 0;
 let heldPiece = null;
 let heldPieceName = null;
 let canHold = true;
-let level = 1;
 let fps = 0;
 let frameCount = 0;
 let lastFpsUpdate = 0;
@@ -606,11 +610,6 @@ function clearLine() {
           break;
       }
 
-      const newLevel = Math.floor(lines / 10) + 1;
-      if (newLevel > level) {
-        level = newLevel;
-      }
-
       // Incrementar combo
       combo++;
       if (combo > maxCombo) {
@@ -619,10 +618,10 @@ function clearLine() {
 
       playSound('lineClear');
 
-      // Calcular puntos con multiplicador de combo
+      // Calcular puntos con multiplicador de combo y dificultad
       const basePoints = linesCleared * 100;
       const comboBonus = combo > 1 ? (combo - 1) * 50 : 0;
-      score += basePoints + comboBonus;
+      score += Math.floor((basePoints + comboBonus) * SCORE_MULTIPLIER);
     } else {
       // Resetear combo si no se limpiaron líneas
       combo = 0;
@@ -634,7 +633,11 @@ function calculateCurrentSpeed() {
     return MS;
   }
 
-  const speedReduction = (level - 1) * 40;
+  const elapsedTime = Date.now() - gameStartTime - totalPausedTime;
+  const secondsPlayed = Math.floor(elapsedTime / 1000);
+
+  const speedIncreaseFactor = Math.floor(secondsPlayed / 30);
+  const speedReduction = speedIncreaseFactor * SPEED_DECREASE_RATE;
   const currentSpeed = Math.max(MIN_SPEED, MS - speedReduction);
 
   return currentSpeed;
@@ -839,7 +842,7 @@ function updateMaxScoreDisplay() {
 
 function addPieceScore() {
   const piecePoints = PIECE_SCORES[player.pieceName] || 0;
-  score += piecePoints;
+  score += Math.floor(piecePoints * SCORE_MULTIPLIER);
 }
 
 function drawStartButton() {
@@ -904,7 +907,6 @@ function togglePause() {
 function startGame() {
   isGameStarted = true;
   isPaused = false;
-  level = 1;
 
   stats.totalPieces = 0;
   stats.singleLines = 0;
@@ -1120,6 +1122,11 @@ document.addEventListener("keydown", (event) => {
   } else if (event.key === "s" || event.key === "ArrowDown" || event.key === "k") {
     CURRENT_INTERVAL_MS = FAST_DROP_MS;
   } else if (event.key === "r") {
+    if (player.pieceName === "O") {
+      playSound('rotate');
+      return;
+    }
+
     const result = tryRotateWithKick(player.piece, player, field);
 
     if (result.success) {
@@ -1217,6 +1224,7 @@ document.querySelectorAll('.difficulty-btn').forEach(btn => {
     MS = preset.MS;
     MIN_SPEED = preset.MIN_SPEED;
     SPEED_DECREASE_RATE = preset.SPEED_DECREASE_RATE;
+    SCORE_MULTIPLIER = preset.SCORE_MULTIPLIER;
     CURRENT_INTERVAL_MS = MS;
 
     const difficultyMenu = document.getElementById('difficulty-menu');
@@ -1232,7 +1240,7 @@ document.querySelectorAll('.difficulty-btn').forEach(btn => {
 const soundToggleBtn = document.getElementById('sound-toggle');
 if (soundToggleBtn) {
   soundToggleBtn.addEventListener('click', () => {
-    if (isCountingDown) return; // Block during countdown
+    if (isCountingDown) return;
     soundEnabled = !soundEnabled;
     soundToggleBtn.textContent = soundEnabled ? '🔊 Sonido: ON' : '🔇 Sonido: OFF';
   });

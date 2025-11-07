@@ -43,23 +43,26 @@ import '../styles/global.css'
 		
 		<div id="difficulty-menu" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
 			<div class="bg-[#1a1a18] border-4 border-[#444] rounded-lg p-4 sm:p-6 md:p-8 max-w-md w-full">
-				<h2 class="text-[#F0F000] font-mono text-2xl sm:text-3xl md:text-4xl mb-4 sm:mb-6 text-center">Selecciona Dificultad</h2>
 				<div class="space-y-3 sm:space-y-4">
-					<button data-difficulty="facil" class="difficulty-btn w-full bg-[#00FF00] hover:bg-[#00CC00] text-black font-mono text-lg sm:text-xl md:text-2xl py-3 sm:py-4 px-4 sm:px-6 rounded-lg transition-all duration-200 transform hover:scale-105">
+					<button data-difficulty="facil" class="difficulty-btn w-full bg-[#F0F000c7] hover:bg-[#F0F000e6] backdrop-blur-sm text-black font-mono text-lg sm:text-xl md:text-2xl py-3 sm:py-4 px-4 sm:px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg shadow-yellow-500/50 border-2 border-[#F0F000]">
 						Fácil
-						<div class="text-xs sm:text-sm mt-1">Velocidad inicial lenta</div>
+						<div class="text-xs sm:text-sm opacity-90 text-start mt-4">Velocidad inicial lenta</div>
+						<div class="text-xs sm:text-sm font-bold text-start">Multiplicador Puntos: 0.8x</div>
 					</button>
-					<button data-difficulty="normal" class="difficulty-btn w-full bg-[#00F0F0] hover:bg-[#00C0C0] text-black font-mono text-lg sm:text-xl md:text-2xl py-3 sm:py-4 px-4 sm:px-6 rounded-lg transition-all duration-200 transform hover:scale-105">
+					<button data-difficulty="normal" class="difficulty-btn w-full bg-[#F0F000c7] hover:bg-[#F0F000e6] backdrop-blur-sm text-black font-mono text-lg sm:text-xl md:text-2xl py-3 sm:py-4 px-4 sm:px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg shadow-yellow-500/50 border-2 border-[#F0F000]">
 						Normal
-						<div class="text-xs sm:text-sm mt-1">Velocidad balanceada</div>
+						<div class="text-xs sm:text-sm opacity-90 text-start mt-4">Velocidad balanceada</div>
+						<div class="text-xs sm:text-sm font-bold text-start">Multiplicador Puntos: 1.0x</div>
 					</button>
-					<button data-difficulty="dificil" class="difficulty-btn w-full bg-[#FFA500] hover:bg-[#FF8C00] text-black font-mono text-lg sm:text-xl md:text-2xl py-3 sm:py-4 px-4 sm:px-6 rounded-lg transition-all duration-200 transform hover:scale-105">
+					<button data-difficulty="dificil" class="difficulty-btn w-full bg-[#F0F000c7] hover:bg-[#F0F000e6] backdrop-blur-sm text-black font-mono text-lg sm:text-xl md:text-2xl py-3 sm:py-4 px-4 sm:px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg shadow-yellow-500/50 border-2 border-[#F0F000]">
 						Difícil
-						<div class="text-xs sm:text-sm mt-1">Velocidad rápida</div>
+						<div class="text-xs sm:text-sm opacity-90 text-start mt-4">Velocidad rápida</div>
+						<div class="text-xs sm:text-sm font-bold text-start">Multiplicador Puntos: 1.5x 🔥</div>
 					</button>
-					<button data-difficulty="imposible" class="difficulty-btn w-full bg-[#FF0000] hover:bg-[#CC0000] text-white font-mono text-lg sm:text-xl md:text-2xl py-3 sm:py-4 px-4 sm:px-6 rounded-lg transition-all duration-200 transform hover:scale-105">
+					<button data-difficulty="imposible" class="difficulty-btn w-full bg-[#F0F000c7] hover:bg-[#F0F000e6] backdrop-blur-sm text-black font-mono text-lg sm:text-xl md:text-2xl py-3 sm:py-4 px-4 sm:px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg shadow-yellow-500/50 border-2 border-[#F0F000]">
 						Imposible
-						<div class="text-xs sm:text-sm mt-1">¡Extremadamente rápido!</div>
+						<div class="text-xs sm:text-sm opacity-90 text-start mt-4">¡Extremadamente rápido!</div>
+						<div class="text-xs sm:text-sm font-bold text-start">Multiplicador Puntos: 2.0x 🔥🔥🔥</div>
 					</button>
 				</div>
 			</div>
