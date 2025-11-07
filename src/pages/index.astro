@@ -1,5 +1,5 @@
 ---
-
+import '../styles/global.css'
 ---
 
 <html lang="en">
@@ -8,9 +8,334 @@
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
+		<title>Tetris</title>
+		<style>
+			@media (max-width: 639px) {
+				#canvas-wrapper {
+					transform: scale(0.75);
+				}
+			}
+			@media (min-width: 640px) and (max-width: 767px) {
+				#canvas-wrapper {
+					transform: scale(0.90);
+				}
+			}
+			@media (min-width: 768px) {
+				@media (max-height: 1100px) {
+					#canvas-wrapper {
+						transform: scale(0.80);
+					}
+				}
+				@media (min-height: 1101px) and (max-height: 1300px) {
+					#canvas-wrapper {
+						transform: scale(0.90);
+					}
+				}
+				@media (min-height: 1301px) {
+					#canvas-wrapper {
+						transform: scale(1);
+					}
+				}
+			}
+		</style>
 	</head>
-	<body>
-		<h1>Astro</h1>
+	<body class="bg-[#2a2a28] overflow-x-hidden">
+		
+		<div id="difficulty-menu" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+			<div class="bg-[#1a1a18] border-4 border-[#444] rounded-lg p-4 sm:p-6 md:p-8 max-w-md w-full">
+				<h2 class="text-[#F0F000] font-mono text-2xl sm:text-3xl md:text-4xl mb-4 sm:mb-6 text-center">Selecciona Dificultad</h2>
+				<div class="space-y-3 sm:space-y-4">
+					<button data-difficulty="facil" class="difficulty-btn w-full bg-[#00FF00] hover:bg-[#00CC00] text-black font-mono text-lg sm:text-xl md:text-2xl py-3 sm:py-4 px-4 sm:px-6 rounded-lg transition-all duration-200 transform hover:scale-105">
+						Fácil
+						<div class="text-xs sm:text-sm mt-1">Velocidad inicial lenta</div>
+					</button>
+					<button data-difficulty="normal" class="difficulty-btn w-full bg-[#00F0F0] hover:bg-[#00C0C0] text-black font-mono text-lg sm:text-xl md:text-2xl py-3 sm:py-4 px-4 sm:px-6 rounded-lg transition-all duration-200 transform hover:scale-105">
+						Normal
+						<div class="text-xs sm:text-sm mt-1">Velocidad balanceada</div>
+					</button>
+					<button data-difficulty="dificil" class="difficulty-btn w-full bg-[#FFA500] hover:bg-[#FF8C00] text-black font-mono text-lg sm:text-xl md:text-2xl py-3 sm:py-4 px-4 sm:px-6 rounded-lg transition-all duration-200 transform hover:scale-105">
+						Difícil
+						<div class="text-xs sm:text-sm mt-1">Velocidad rápida</div>
+					</button>
+					<button data-difficulty="imposible" class="difficulty-btn w-full bg-[#FF0000] hover:bg-[#CC0000] text-white font-mono text-lg sm:text-xl md:text-2xl py-3 sm:py-4 px-4 sm:px-6 rounded-lg transition-all duration-200 transform hover:scale-105">
+						Imposible
+						<div class="text-xs sm:text-sm mt-1">¡Extremadamente rápido!</div>
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<div class="flex justify-center items-center min-h-screen px-2 sm:px-4 py-4">
+			<div class="flex flex-col lg:flex-row gap-4 md:gap-6 lg:gap-10 items-start w-full max-w-[1600px] justify-center">
+				
+				<div class="hidden lg:block bg-[#1a1a18] border-[3px] border-[#444] rounded-lg p-4 xl:p-6 min-w-[220px] xl:min-w-[250px] shadow-[0_0_20px_rgba(0,0,0,0.5)]">
+					<h2 class="text-[#F0F000] font-mono text-3xl mb-5 text-center border-b-2 border-[#444] pb-2">Controles</h2>
+
+					
+					<div class="mb-6">
+						<h3 class="text-[#00F0F0] font-mono text-lg mb-3">Movimiento</h3>
+						<div class="space-y-2 text-sm">
+							<div class="flex items-center gap-3">
+								<kbd class="bg-[#444] text-white px-2 py-1 rounded font-mono text-xs min-w-[40px] text-center">A</kbd>
+								<kbd class="bg-[#444] text-white px-2 py-1 rounded font-mono text-xs min-w-[40px] text-center">←</kbd>
+								<span class="text-gray-400">Mover izquierda</span>
+							</div>
+							<div class="flex items-center gap-3">
+								<kbd class="bg-[#444] text-white px-2 py-1 rounded font-mono text-xs min-w-[40px] text-center">D</kbd>
+								<kbd class="bg-[#444] text-white px-2 py-1 rounded font-mono text-xs min-w-[40px] text-center">→</kbd>
+								<span class="text-gray-400">Mover derecha</span>
+							</div>
+							<div class="flex items-center gap-3">
+								<kbd class="bg-[#444] text-white px-2 py-1 rounded font-mono text-xs min-w-[40px] text-center">S</kbd>
+								<kbd class="bg-[#444] text-white px-2 py-1 rounded font-mono text-xs min-w-[40px] text-center">↓</kbd>
+								<span class="text-gray-400">Caída rápida</span>
+							</div>
+						</div>
+					</div>
+
+					
+					<div class="mb-6 border-t-2 border-[#444] pt-4">
+						<h3 class="text-[#00F0F0] font-mono text-lg mb-3">Acciones</h3>
+						<div class="space-y-2 text-sm">
+							<div class="flex items-center gap-3">
+								<kbd class="bg-[#444] text-white px-2 py-1 rounded font-mono text-xs min-w-[40px] text-center">R</kbd>
+								<span class="text-gray-400">Rotar pieza</span>
+							</div>
+							<div class="flex items-center gap-3">
+								<kbd class="bg-[#444] text-white px-2 py-1 rounded font-mono text-xs min-w-[40px] text-center">W</kbd>
+								<kbd class="bg-[#444] text-white px-2 py-1 rounded font-mono text-xs min-w-[40px] text-center">↑</kbd>
+								<span class="text-gray-400">Caída instantánea</span>
+							</div>
+							<div class="flex items-center gap-3">
+								<kbd class="bg-[#444] text-white px-2 py-1 rounded font-mono text-xs min-w-[40px] text-center">H</kbd>
+								<span class="text-gray-400">Guardar pieza</span>
+							</div>
+						</div>
+					</div>
+
+					
+					<div class="mb-6 border-t-2 border-[#444] pt-4">
+						<h3 class="text-[#00F0F0] font-mono text-lg mb-3">Sistema</h3>
+						<div class="space-y-2 text-sm">
+							<div class="flex items-center gap-3">
+								<kbd class="bg-[#444] text-white px-2 py-1 rounded font-mono text-xs">SPACE</kbd>
+								<span class="text-gray-400">Pausar/Reanudar</span>
+							</div>
+							<div class="flex items-center gap-3">
+								<kbd class="bg-[#444] text-white px-2 py-1 rounded font-mono text-xs">ESC</kbd>
+								<span class="text-gray-400">Pausar/Reanudar</span>
+							</div>
+							<div class="flex items-center gap-3">
+								<kbd class="bg-[#444] text-white px-2 py-1 rounded font-mono text-xs">CLICK</kbd>
+								<span class="text-gray-400">Iniciar juego</span>
+							</div>
+						</div>
+					</div>
+
+					
+					<div class="border-t-2 border-[#444] pt-4">
+						<h3 class="text-[#FFA500] font-mono text-sm mb-2">💡 Consejos</h3>
+						<ul class="space-y-1 text-xs text-gray-500">
+							<li>• La pieza fantasma muestra dónde caerá</li>
+							<li>• Usa "H" para guardar piezas difíciles</li>
+							<li>• Combos dan puntos extra</li>
+							<li>• Tetris (4 líneas) = más puntos</li>
+						</ul>
+					</div>
+				</div>
+
+				
+				<div class="flex flex-col md:flex-row gap-4 md:gap-6 items-start justify-center w-full lg:w-auto">
+
+					<div id="canvas-wrapper" class="transition-all duration-300 mx-auto md:mx-0 origin-top">
+						<canvas id="canvas" width="360" height="800" class="border-[3px] border-[#444] shadow-[0_0_20px_rgba(0,0,0,0.5)]"></canvas>
+
+						<div class="flex gap-2 justify-center mt-2">
+							<button id="sound-toggle" class="px-3 py-2 bg-[#444] text-white font-mono text-xs rounded hover:bg-[#666] transition-colors">
+								🔊 Sonido: ON
+							</button>
+							<button id="particles-toggle" class="px-3 py-2 bg-[#444] text-white font-mono text-xs rounded hover:bg-[#666] transition-colors">
+								✨ Partículas: ON
+							</button>
+						</div>
+
+						<div class="text-center text-gray-500 font-mono text-xs mt-1">
+							Hecho por <span class="text-gray-400">X4RLYi</span>
+						</div>
+					</div>
+
+					
+					<div class="bg-[#1a1a18] border-[3px] border-[#444] rounded-lg p-4 sm:p-5 md:p-6 w-full md:w-auto md:min-w-[200px] shadow-[0_0_20px_rgba(0,0,0,0.5)]">
+						<h1 class="text-[#FFD700] font-mono text-base md:text-4xl mb-4 md:mb-5 text-center pb-2">🎮 Tetris</h1>
+
+						<h2 class="text-[#00F0F0] font-mono text-base md:text-lg mb-4 md:mb-5 text-center border-b-2 border-[#444] pb-2">Puntuación</h2>
+
+						
+						<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+							
+							<div class="space-y-3">
+								
+								<div class="flex justify-between items-center font-mono text-xs sm:text-sm bg-gradient-to-r from-[#FFD700]/10 to-transparent p-2 rounded border-l-4 border-[#FFD700]">
+									<span class="text-[#FFD700] font-bold">🏆 Récord:</span>
+									<span id="max-score-value" class="text-[#FFD700] font-bold min-w-20 text-right text-sm sm:text-base">0</span>
+								</div>
+
+								
+								<div class="flex justify-between font-mono text-xs sm:text-sm">
+									<span class="text-gray-400">Puntos:</span>
+									<span id="score-value" class="text-white font-bold min-w-20 text-right">0</span>
+								</div>
+
+								<div class="flex justify-between font-mono text-xs sm:text-sm">
+									<span class="text-gray-400">Combo Máximo:</span>
+									<span id="max-combo" class="text-white font-bold min-w-20 text-right">0</span>
+								</div>
+
+								<div class="flex justify-between font-mono text-xs sm:text-sm">
+									<span class="text-gray-400">Líneas:</span>
+									<span id="lines-value" class="text-white font-bold min-w-20 text-right">0</span>
+								</div>
+
+								
+								<div class="justify-center flex gap-3 sm:gap-5 pt-2">
+									<div>
+										<h3 class="text-[#F0F000] font-mono text-xs sm:text-sm mb-2 text-center">Siguiente pieza</h3>
+										<div class="flex justify-center">
+											<canvas id="next-piece-canvas" width="50" height="50" class="border-2 border-[#444] bg-black"></canvas>
+										</div>
+									</div>
+									<div>
+										<h3 class="text-[#00FF00] font-mono text-xs sm:text-sm mb-2 text-center">Guardar (H)</h3>
+										<div class="flex justify-center">
+											<canvas id="hold-piece-canvas" width="50" height="50" class="border-2 border-[#444] bg-black"></canvas>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							
+							<div class="space-y-3 lg:border-l-2 lg:border-[#444] lg:pl-4">
+								<h3 class="text-gray-400 font-mono text-sm md:text-base mb-2 text-center lg:text-left">Estadísticas</h3>
+
+								<div class="flex justify-between font-mono text-xs sm:text-sm">
+									<span class="text-gray-500">Tiempo:</span>
+									<span id="time-value" class="text-white">0:00</span>
+								</div>
+
+								<div class="flex justify-between font-mono text-xs sm:text-sm">
+									<span class="text-gray-500">Piezas/min:</span>
+									<span id="ppm-value" class="text-white">0</span>
+								</div>
+
+								<div class="flex justify-between font-mono text-xs sm:text-sm">
+									<span class="text-gray-500">Total piezas:</span>
+									<span id="total-pieces-value" class="text-white">0</span>
+								</div>
+
+								
+								<div class="mt-2">
+									<h4 class="text-gray-500 font-mono text-xs mb-2 text-center lg:text-left">Piezas Usadas</h4>
+									<div class="grid grid-cols-2 gap-1.5">
+										
+										<div class="flex items-center gap-1.5 bg-[#222] rounded p-1">
+											<canvas id="piece-stat-O" width="40" height="40" class="border border-[#444]"></canvas>
+											<span id="piece-count-O" class="text-white font-mono text-xs font-bold">0</span>
+										</div>
+
+										
+										<div class="flex items-center gap-1.5 bg-[#222] rounded p-1">
+											<canvas id="piece-stat-I" width="40" height="40" class="border border-[#444]"></canvas>
+											<span id="piece-count-I" class="text-white font-mono text-xs font-bold">0</span>
+										</div>
+
+										
+										<div class="flex items-center gap-1.5 bg-[#222] rounded p-1">
+											<canvas id="piece-stat-T" width="40" height="40" class="border border-[#444]"></canvas>
+											<span id="piece-count-T" class="text-white font-mono text-xs font-bold">0</span>
+										</div>
+
+										
+										<div class="flex items-center gap-1.5 bg-[#222] rounded p-1">
+											<canvas id="piece-stat-S" width="40" height="40" class="border border-[#444]"></canvas>
+											<span id="piece-count-S" class="text-white font-mono text-xs font-bold">0</span>
+										</div>
+
+										
+										<div class="flex items-center gap-1.5 bg-[#222] rounded p-1">
+											<canvas id="piece-stat-Z" width="40" height="40" class="border border-[#444]"></canvas>
+											<span id="piece-count-Z" class="text-white font-mono text-xs font-bold">0</span>
+										</div>
+
+										
+										<div class="flex items-center gap-1.5 bg-[#222] rounded p-1">
+											<canvas id="piece-stat-L" width="40" height="40" class="border border-[#444]"></canvas>
+											<span id="piece-count-L" class="text-white font-mono text-xs font-bold">0</span>
+										</div>
+
+										
+										<div class="flex items-center gap-1.5 bg-[#222] rounded p-1">
+											<canvas id="piece-stat-J" width="40" height="40" class="border border-[#444]"></canvas>
+											<span id="piece-count-J" class="text-white font-mono text-xs font-bold">0</span>
+										</div>
+									</div>
+								</div>
+
+								
+								<div class="py-2 border-t border-[#444]">
+									<h4 class="text-gray-500 font-mono text-xs mb-2 text-center lg:text-left">Líneas Limpiadas</h4>
+									<div class="grid grid-cols-2 gap-1.5 text-xs text-gray-600 font-mono">
+										<div class="flex justify-between">
+											<span>Simple:</span>
+											<span id="single-count">0</span>
+										</div>
+										<div class="flex justify-between">
+											<span>Doble:</span>
+											<span id="double-count">0</span>
+										</div>
+										<div class="flex justify-between">
+											<span>Triple:</span>
+											<span id="triple-count">0</span>
+										</div>
+										<div class="flex justify-between text-[#F0F000]">
+											<span>Tetris:</span>
+											<span id="tetris-count">0</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 	</body>
 </html>
+<script src="../js/script.js"></script>
+<style>
+	* {
+		box-sizing: border-box;
+	}
+
+	#canvas-wrapper {
+		display: inline-block;
+		transition: all 0.3s ease;
+	}
+
+	#canvas-wrapper.danger {
+		border-color: #FF0000;
+		border-width: 6px;
+		box-shadow: 0 0 30px rgba(255, 0, 0, 0.8), inset 0 0 20px rgba(255, 0, 0, 0.3);
+		animation: dangerBlink 0.8s ease-in-out infinite;
+	}
+
+	@keyframes dangerBlink {
+		0%, 100% {
+			border-color: #FF0000;
+			box-shadow: 0 0 30px rgba(255, 0, 0, 0.8), inset 0 0 20px rgba(255, 0, 0, 0.3);
+		}
+		50% {
+			border-color: #FF4444;
+			box-shadow: 0 0 50px rgba(255, 0, 0, 1), inset 0 0 30px rgba(255, 0, 0, 0.5);
+		}
+	}
+</style>
